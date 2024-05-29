@@ -1,0 +1,247 @@
+
+\documentclass{article}
+\usepackage[oldvoltagedirection]{circuitikz}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{tabularx}
+\usepackage{caption}
+\usepackage[italian]{babel}
+\usepackage{gensymb}
+\usepackage{pgfplots}
+\usepackage{ulem}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{comment}
+
+
+\usepackage{graphicx} % Required for inserting images
+\usepackage[a4paper, margin=2cm]{geometry}
+
+\title{Relazione di Misure: Ohmmetro}
+\author{Marko Milosevic & Nicolas Zani}
+\begin{document}
+
+\maketitle
+
+\section{Obiettivo}
+
+Progettare e realizzare in forma prototipale un ohmmetro con le seguenti specifiche:
+
+- Campo di misura: 0-10 k$\ohm$
+
+- Accuratezza di misura (k = 1): 1\% F.S.
+
+- Lettura: 0-10 V
+
+\section{Dimensionamento di massima dell'ohmetro: si devono definire il valore della corrente di sonda e il guadagno dell'amplificatore da strumentazione}
+
+Definiamo la corrente di sonda $I_s$ come la corrente generata da un generatore di corrente, che attraversa un resistore di resistenza incognita $R_x$ , inducendo una caduta di tensione ai suoi capi.
+
+\noindent Il valore di $I_s$ deve essere ben bilanciato: una corrente troppo bassa produrrebbe una tensione ai capi di $R_x$ troppo piccola, richiedendo un'elevata amplificazione, mentre una corrente troppo alta causerebbe una dissipazione eccessiva di potenza, con il rischio di riscaldare il resistore $R_x$ per effetto Joule, alterandone la resistenza.
+
+\noindent In laboratorio, sono disponibili resistori da 1/4 W. Dato che la potenza è data da P=V*I, possiamo esprimere la tensione in funzione della resistenza e della corrente di sonda: \textbf{$P = R_x * I_s^2$}
+
+\noindent Nei comuni ohmmetri, la potenza massima dissipata è di 0,1 mW, molto inferiore alla potenza massima supportata dai resistori disponibili in laboratorio. Pertanto, possiamo scrivere:
+
+\begin{equation}
+    P = R_x * I_s^2 = 0,1mW
+\end{equation}
+
+Dato che $I_s$ deve essere costante, la potenza massima dissipata so verifica al valore massimo di $R_x$ fissato a 10k\ohm dalle specifiche del progetto. Quindi: 
+
+\begin{equation}
+    P_{MAX} = R_{x,MAX} * I_{s,MAX}^2 => I_s = \sqrt{\frac{P_{MAX}}{R_{x,MAX}}} = 100uA
+\end{equation}
+
+Di conseguenza, la caduta di tensione massima ai capi del resistore $R_x$ è
+
+\begin{equation}
+    V_{MAX} = R_{x,max} * I_s = 10k\ohm * 100uA = 1V
+\end{equation}
+
+\vspace{5pt}
+Poichè dalle specifiche ci viene detto che la massima tensione in uscita è 10V, si ha che il guadagno vale
+
+\begin{equation}
+    G = \sqrt{\frac{Vo_{max}}{Vi_{max}}} = 10
+\end{equation}
+
+\section{Progettare il generatore di corrente selezionando un opportuno schema e dimensionando i componenti}
+
+Per generare la corrente $I_S$, abbiamo scelto di utilizzare un convertitore tensione-corrente di Howland.
+
+In figura \ref{fig:generatore} lo schema elettrico
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{generatore.png}
+    \caption{Schema elettrico del generatore di corrente}
+    \label{fig:generatore}
+\end{figure}
+
+
+\vspace{5pt}
+
+\noindent Consideriamo l'ipotesi che l'amplificatore operazionale sia ideale, il che implica che le correnti in ingresso ai terminali 
++ e - siano nulle.
+
+\noindent Applicando la legge di Kirchoff, possiamo affermare che la corrente che scorre nel carico è pari a:
+
+\begin{equation}
+    I_S = I_3 + I_4
+\end{equation}
+
+\noindent Sfruttando la legge di Ohm possiamo esprimere $I_3$ e $I_4$ come
+
+\begin{equation}
+    I_S = \frac{V_I - V_X}{R_3} + \frac{V_O - V_X}{R_4} 
+    \label{eq:il}
+\end{equation}
+
+
+\noindent La tensione di uscita vale:
+\begin{equation}
+    V_o = V_X * (1 + \frac{R_2}{R_1})
+    \label{eq:t}
+\end{equation}
+
+\noindent Sostituendo l'eq \ref{eq:t} per $V_o$ nell' equazione \ref{eq:il} e scegliendo $\frac{R_2}{R_1} = \frac{R_3}{R_4}$, otteniamo:
+
+\begin{equation}
+    I_S = \frac{V_I}{R_3}
+    \label{eq:8}
+\end{equation}
+
+\noindent Impostando $V_I = 15V$ e $I_S = 100uA$ ,e invertendo l'eq \ref{eq:8}, si ricava $R_3$
+
+\begin{equation}
+    R_3 = \frac{V_I}{I_S} = 150k\ohm
+\end{equation}
+
+\noindent Decidiamo quindi, per comodità $R_1 = R_2 = R_3 = R_4 = 150k\ohm$
+
+\section{Definire la procedura di calibrazione del generatore di corrente al fine di garantirne la linearità ed in genere le specifiche definite al punto 3 sull'intero campo di funzionamento dell'ohmetro}
+
+Per la calibrazione del generatore di corrente, abbiamo sostituito il resistore $R_3$ con un potenziometro da $100k\ohm$ e un resistore da $100k\ohm$. Lo scopo di questa configurazione era quello di garantire che la corrente $I_S$ rimanesse costante a $100uA$,indipendentemente dal valore della resistenza $R_X$
+
+\vspace{5pt}
+\noindent La procedura di calibrazione è stata eseguita nel modo seguente e viene ripetuta prima di ogni misurazione:
+
+\begin{itemize}
+    \item Abbiamo inserito il multimetro, configurato come milliamperometro, in serie a $R_X$;
+    
+    \item Abbiamo sostituito $R_X$ con un cortocircuito per simulare una resistenza nulla;
+    \item Abbiamo verificato che il milliamperometro fornisse una corrente di $100uA$;
+    \item Successivamente, abbiamo sostituito $R_X$ con un potenziometro da $10k\ohm$ portato a fine corsa;
+    \item Abbiamo verificato che il milliamperometro fornisse una corrente di $100uA \pm u(I_S)$
+    \item Infine, abbiamo regolato i potenziometri inseriti al posto di $R_3$ in modo da ottenere una corrente di $100uA$;
+\end{itemize}
+
+
+\section{Progettare l'amplificatore di strumentazione e dimensionare i componenti per garantire le specifiche definite al punto 3}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{strumentazione.png}
+    \caption{Enter Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+
+
+La tensione di uscita in un amplificatore da strumentazione è descritta come il prodotto del guadagno dell'amplificatore per la differenza di potenziale tra i suoi ingressi: 
+
+\begin{equation}
+    V_O = \frac{R_{13}}{R_9} (1+ \frac{2R_7}{R_G}) (V_2 - V_1) 
+\end{equation}
+
+\noindent Il guadagno dell'amplificatore lo facciamo coincidere con quello calcolato nel punto 2
+
+\begin{equation}
+     G = \frac{R_{13}}{R_9} (1+ \frac{2R_7}{R_G}) = 10
+     \label{eq:11}
+\end{equation}
+
+\noindent Per semplicità dei calcoli poniamo
+
+$R_7 = R_8 = 20k\ohm$
+
+$R_9 = R_{10} = 10k\ohm$
+
+\noindent Per la selezione delle resistenze $R_G$ e $R_{11}$, ci basiamo sui valori disponibili delle resistenze commerciali, considerando le tolleranze per ottenere i valori massimi e minimi. È inoltre essenziale che una parte di queste resistenze sia implementata attraverso un potenziometro per compensare le variazioni.
+
+In questo processo, dimensioniamo $R_G$ per ottenere un guadagno G=10, mentre $R_{11}$ è dimensionato per massimizzare la reiezione di modo comune (CMRR).
+
+\vspace{10pt}
+\noindent Iniziamo il processo di determinazione di $R_G$ attraverso l'inversione della formula \ref{eq:11}, ottenendo
+
+\begin{equation}
+    R_G = \frac{2R_7}{\frac{R_9 G}{R_{13}} - 1}
+\end{equation}
+
+\noindent Considerando che i resistori commerciali tipicamente presentano una tolleranza dell'1\%, possiamo scrivere
+
+\begin{equation}
+    R_{G_{min}} = \frac{2R_{7_{min}}}{\frac{R_{9_{max}} G}{R_{13_{min}}} - 1} = \frac{2 * 0,99 * 20k\ohm}{10 * \frac{1,01 * 10k\ohm}{0,99 * 20k\ohm} - 1} = 9656,15 \ohm
+\end{equation}
+    
+\begin{equation}
+     R_{G_{max}} = \frac{2R_{7_{max}}}{\frac{R_{9_{min}} G}{R_{13_{max}}} - 1} = \frac{2 * 1,01 * 20k\ohm}{10 * \frac{0,99 * 10k\ohm}{1,01 * 20k\ohm} - 1} = 10356,34 \ohm
+\end{equation}
+
+\noindent Di conseguenza, la resistenza $R_G$ subirà una variazione
+\begin{equation}
+    \Delta R_G =  R_{G_{max}} - R_{G_{min}} = 700, 19 \ohm
+\end{equation}
+
+\noindent Per compensare questa variazione, è sufficiente inserire in serire a $R_G$ un potenziometro da $1k\ohm$. Per disponibilità di componenti abbiamo scelto un potenziometro da 10k$\ohm$ e un resistore da 10k$\ohm$
+
+\vspace{20pt}
+\noindent Il CMRR, acronimo di "Common Mode Rejection Ratio" (Rapporto di Reiezione in Modalità Comune), è una misura della capacità di un amplificatore differenziale di sopprimere segnali che appaiono allo stesso modo su entrambi gli ingressi. In altre parole, rappresenta la capacità di un amplificatore di ignorare i segnali che si presentano simultaneamente su entrambi gli ingressi e amplificare solo la differenza tra i segnali sui due ingressi. Il CMRR viene generalmente espresso in decibel (dB) e indica il rapporto tra l'amplificazione del segnale differenziale e l'amplificazione del segnale in modalità comune. Un CMRR più alto indica una maggiore capacità dell'amplificatore di eliminare i segnali indesiderati che si presentano su entrambi gli ingressi.
+
+il CMRR è massimo quando
+
+\begin{equation}
+    \frac{R_9}{R_{10}} = \frac{R_{13}}{R_{11}}
+\end{equation}
+
+
+\noindent Per determinare il valore della resistenza  $R_{11}$. Per calcolare la sua variazione è necessario considerare le tolleranze dei componenti da cui dipende
+
+\begin{equation}
+    R_{11} = \frac{R_{13} * R_{10}}{R_9} 
+\end{equation}
+
+\noindent Si ricava
+
+\begin{equation}
+    R_{11_{min}} = \frac{R_{13_{min}} * R_{10_{min}}}{R_{9_{max}}} = \frac{0,99 * R_{13} * 0,99 * R_{10}}{1,01 * R_9} = 19,41k\ohm
+\end{equation}
+
+\begin{equation}
+    R_{11_{max}} = \frac{R_{13_{mnax}} * R_{10_{max}}}{R_{9_{min}}} = \frac{1,01 * R_{13} * 1,01 * R_{10}}{0,99 * R_9} = 20,61k\ohm
+\end{equation}
+
+Quindi, la variazione vale
+\begin{equation}
+    \Delta R_{11} = R_{11_{max}} - R_{11_{min}} = 1,2k\ohm
+\end{equation}
+
+\noindent La composizione del ramo di $R_{11}$ avviene mettendo in serie un potenziometro $R_{12}$ da $10k\ohm$ e un resistore $R_{11}$ da $10k\ohm$
+
+Sapnedo che il CMRR è uguale al rapporto tra il guadagno di modo differenziale $A_D$ e il guadagno di modo comune $A_C$, dove nel nostro caso $A_D = 10$
+
+\begin{equation}
+    CMRR = \frac{A_D}{A_C}
+\end{equation}
+
+\noindent il guadagno di modo comune vale
+\begin{equation}
+    A_C = A_+ - A_-
+\end{equation}
+
+\noindent Nel caso ideale si ha $A_+ = A_-$ e quindi CMRR =$ \infty$. Nel caso reale è difficle ottenere la condizione $A_+ = A_-$
+\end{document}
