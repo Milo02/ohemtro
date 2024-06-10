@@ -1,0 +1,1450 @@
+
+\documentclass{article}
+\usepackage[oldvoltagedirection]{circuitikz}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{tabularx}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage[italian]{babel}
+\usepackage{gensymb}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+
+\usepackage{ulem}
+\usepackage{float}
+\usepackage[demo]{graphicx}
+\usepackage{xcolor}
+\usepackage{comment}
+%\captionsetup[subfigure]{labelformat=empty}
+%\newcounter{subfigurecounter}
+\usepackage{siunitx}
+
+\sisetup{output-decimal-marker={,}}
+
+\usepackage{graphicx} % Required for inserting images
+\usepackage[a4paper, margin=2cm]{geometry}
+
+\title{Relazione di Misure: Ohmmetro}
+\author{Marko Milosevic & Nicolas Zani}
+\begin{document}
+
+\maketitle
+
+\section{Obiettivo}
+
+Progettare e realizzare in forma prototipale un ohmmetro con le seguenti specifiche:
+
+- Campo di misura: 0-10 k$\ohm$
+
+- Accuratezza di misura (k = 1): 1\% F.S.
+
+- Lettura: 0-10 V
+
+\section{Sulla base del modello individuato procedere con l'analisi dell'incertezza di misura attesa al fine di definire le specifiche sia del generatore di corrente sia dell'amplificatore da strumentazione}
+
+\uline{Stima dell'incertezza preliminare}
+
+Vogliamo stimare l'incertezza del parametro Rx che è descritto tramite il modello:
+
+\begin{equation}
+    R_x = \frac{V_o}{G * I_s}  [\ohm]
+\end{equation}
+
+Ciascuno dei parametri da cui dipende Rx sono caratterizzati da incertezza, quindi l'incertezza tipo di Rx sarà
+
+\begin{equation}
+    u(R_x) = \sqrt{
+    (\frac{\partial R_x}{\partial V_o})^2 * u^2(V_o) + (\frac{\partial R_x}{\partial I_s})^2 * u^2(I_s) + (\frac{\partial R_x}{\partial G})^2 * u^2(G)} [\ohm]
+    \label{eq:u(rx)}
+\end{equation}
+
+\noindent Adesso, si mira a individuare i valori massimi di queste tre fonti di incertezza, al fine di fornire preliminarmente una caratterizzazione qualitativa delle specifiche. 
+Prendiamo il fondo scala del campo di misura che vale $10k\ohm$. Dalle specifiche ricaviamo che l'incertezza estesa vale $U(R_x) = 1\% * 10 k\ohm = 100\ohm$. 
+
+Ecco che possiamo ricavare l'incertezza tipo che risulta , con un k=1: $u(R_x) = \frac{U(R_x)}{k} = 100\ohm$
+
+\vspace{5pt}
+\noindent Ipotizziamo che le tre fonti di incertezza diano lo stesso contributo:
+
+\begin{equation}
+    (\frac{\partial R_x}{\partial V_o})^2 * u^2(V_o) = (\frac{\partial R_x}{\partial I_s})^2 * u^2(I_s) = (\frac{\partial R_x}{\partial G})^2 * u^2(G) = X^2
+\end{equation}
+
+\noindent Quindi
+
+\begin{equation}
+    u(R_x) = \sqrt{3X^2} = 100\ohm  ==> X = \frac{100}{\sqrt{3}}[\ohm]
+\end{equation}
+
+Adesso per determinare l'incertezza di ciascun parametro da cui dipende Rx calcoliamo le derivate parziali di Rx rispetto ai suo parametri:
+
+\begin{equation}
+    \frac{\partial R_x}{\partial V_o} = \frac{1}{G*I_s} = 10^3 \frac{[\ohm]}{[V]}  ==> u(V_o) = \sqrt{\frac{X^2}{(\frac{\partial R_x}{\partial V_o})^2}} \simeq 0,0577 V
+    \label{eq:vo}
+\end{equation}
+
+\begin{equation}
+    \frac{\partial R_x}{\partial I_s} = -\frac{V_o}{G * I^2_s} = 10^8\frac{[\ohm]}{[A]}  ==> u(I_s) = \sqrt{\frac{X^2}{(\frac{\partial R_x}{\partial I_s})^2}} \simeq 5,7735 * 10 ^{-7} A
+\end{equation}
+
+\begin{equation}
+    \frac{\partial R_x}{\partial G} = \frac{-V_o}{G^2 * I_s} = - 10^3  ==> u(G) = \sqrt{\frac{X^2}{(\frac{\partial R_x}{\partial G})^2}} \simeq 0,0577
+
+    \label{eq:u(g)}
+\end{equation}
+
+\noindent\uline{Stima dell'incertezza a posteriori}
+
+\noindent Se adesso individuiamo un'incertezza minore per una componente rispetto a quanto previsto inizialmente, ciò lascia spazio per una maggiore incertezza stimata su altre componenti. Tuttavia, è essenziale garantire che l'incertezza composta non superi i 100$\ohm$
+
+\vspace{5pt}
+\noindent Dalle specifiche ci viene detto che la lettura massima del ohmetro è 10V. Dal datasheet del mmultimetro, in queste condizioni, ci viene detto che la risoluzione è di 0,01V. Sempre dal datasheet ricaviamo che l'accurattezza associata è 0,7\% della lettura + 3 cifre meno significative, quindi:
+
+\begin{equation}
+    U(V_o) = 0,7\% * reading + 3 = 0,7\% * 10V + 30mV = 0,1V
+\end{equation}
+
+\noindent Con k=2, l'incertezza tipo vale:
+\begin{equation}
+    u(V_o) = \frac{U(V_o)}{k} = 0,05V
+    \label{eq:9}
+\end{equation}
+
+\noindent Notiamo che l'incertezza u(Vo) risulta minore rispetto a quanto calcolata nell'eq \ref{eq:vo}
+
+\vspace{6pt}
+\noindent Per semplicità ipotizziamo l'incertezza u(G) sia uguale a quella stimata nella \ref{eq:u(g)}
+
+\vspace{6pt}
+\noindent Tramite la formula inversa dell'equazione \ref{eq:u(rx)} possiamo ricavare il valore di $u(I_s)$, essendo noti tutti gli altri parametri:
+
+\begin{equation}
+    u(I_s) = \sqrt{\frac{u^2(R_x) - (\frac{\partial R_x}{\partial V_o})^2 * u^2(V_o) - (\frac{\partial R_x}{\partial G})^2 * u^2(G) }{(\frac{\partial R_x}{\partial I_s})^2}} \simeq 6,47 * 10^{-7} A
+\end{equation}
+
+Nella tabella \ref{tab: inc} riportiamo tutte le incertezze
+\begin{table}[H]
+    \centering
+    \captionsetup{tableposition=top}
+    \caption{Tabella raissuntiva delle incertezze}
+
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+
+  \hline
+  x & $\hat{x}$ & U(x) & k & u(x) & $\frac{\partial f}{\partial x}$ & $(\frac{\partial f}{\partial x})^2$ \\
+  \hline
+  $V_o$ & 10V & 0,1V & 2 & 0,05V & $10^3 \frac{\ohm}{V}$ & $10^6 \frac{\ohm^2}{V^2}$ \\
+  \hline
+  G & 10 & 0,1154 & 2 & 0,0577 & $-10^3\ohm$ & $-10^6\ohm^2$ \\
+  \hline
+  $I_s$ & 100uA & 1,292 * $10^-6$ & 2 & $6,47 * 10^{-7} A$ & $-10^8 \frac{\ohm}{A}$ & $10^{16} \frac{\ohm^2}{V^2}$ \\
+  \hline
+ 
+\end{tabular}
+    \label{tab: inc}
+\end{table}
+
+
+
+\section{Dimensionamento di massima dell'ohmetro: si devono definire il valore della corrente di sonda e il guadagno dell'amplificatore da strumentazione}
+
+Definiamo la corrente di sonda $I_s$ come la corrente generata da un generatore di corrente, che attraversa un resistore di resistenza incognita $R_x$ , inducendo una caduta di tensione ai suoi capi.
+
+\noindent Il valore di $I_s$ deve essere ben bilanciato: una corrente troppo bassa produrrebbe una tensione ai capi di $R_x$ troppo piccola, richiedendo un'elevata amplificazione, mentre una corrente troppo alta causerebbe una dissipazione eccessiva di potenza, con il rischio di riscaldare il resistore $R_x$ per effetto Joule, alterandone la resistenza.
+
+\noindent In laboratorio, sono disponibili resistori da 1/4 W. Dato che la potenza è data da P=V*I, possiamo esprimere la tensione in funzione della resistenza e della corrente di sonda: \textbf{$P = R_x * I_s^2$}
+
+\noindent Nei comuni ohmmetri, la potenza massima dissipata è di 0,1 mW, molto inferiore alla potenza massima supportata dai resistori disponibili in laboratorio. Pertanto, possiamo scrivere:
+
+\begin{equation}
+    P = R_x * I_s^2 = 0,1mW
+\end{equation}
+
+Dato che $I_s$ deve essere costante, la potenza massima dissipata so verifica al valore massimo di $R_x$ fissato a 10k\ohm dalle specifiche del progetto. Quindi: 
+
+\begin{equation}
+    P_{MAX} = R_{x,MAX} * I_{s,MAX}^2 => I_s = \sqrt{\frac{P_{MAX}}{R_{x,MAX}}} = 100uA
+\end{equation}
+
+Di conseguenza, la caduta di tensione massima ai capi del resistore $R_x$ è
+
+\begin{equation}
+    V_{MAX} = R_{x,max} * I_s = 10k\ohm * 100uA = 1V
+\end{equation}
+
+\vspace{5pt}
+Poichè dalle specifiche ci viene detto che la massima tensione in uscita è 10V, si ha che il guadagno vale
+
+\begin{equation}
+    G = \sqrt{\frac{Vo_{max}}{Vi_{max}}} = 10
+\end{equation}
+
+\section{Progettare il generatore di corrente selezionando un opportuno schema e dimensionando i componenti}
+
+Per generare la corrente $I_S$, abbiamo scelto di utilizzare un convertitore tensione-corrente di Howland.
+
+In figura \ref{fig:generatore} lo schema elettrico
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{generatore.png}
+    \caption{Schema elettrico del generatore di corrente}
+    \label{fig:generatore}
+\end{figure}
+
+
+\vspace{5pt}
+
+\noindent Consideriamo l'ipotesi che l'amplificatore operazionale sia ideale, il che implica che le correnti in ingresso ai terminali 
++ e - siano nulle.
+
+\noindent Applicando la legge di Kirchoff, possiamo affermare che la corrente che scorre nel carico è pari a:
+
+\begin{equation}
+    I_S = I_3 + I_4
+\end{equation}
+
+\noindent Sfruttando la legge di Ohm possiamo esprimere $I_3$ e $I_4$ come
+
+\begin{equation}
+    I_S = \frac{V_I - V_X}{R_3} + \frac{V_O - V_X}{R_4} 
+    \label{eq:il}
+\end{equation}
+
+
+\noindent La tensione di uscita vale:
+\begin{equation}
+    V_o = V_X * (1 + \frac{R_2}{R_1})
+    \label{eq:t}
+\end{equation}
+
+\noindent Sostituendo l'eq \ref{eq:t} per $V_o$ nell' equazione \ref{eq:il} e scegliendo $\frac{R_2}{R_1} = \frac{R_3}{R_4}$, otteniamo:
+
+\begin{equation}
+    I_S = \frac{V_I}{R_3}
+    \label{eq:8}
+\end{equation}
+
+\noindent Impostando $V_I = 15V$ e $I_S = 100uA$ ,e invertendo l'eq \ref{eq:8}, si ricava $R_3$
+
+\begin{equation}
+    R_3 = \frac{V_I}{I_S} = 150k\ohm
+\end{equation}
+
+\noindent Decidiamo quindi, per comodità $R_1 = R_2 = R_3 = R_4 = 150k\ohm$
+
+\section{Definire la procedura di calibrazione del generatore di corrente al fine di garantirne la linearità ed in genere le specifiche definite al punto 3 sull'intero campo di funzionamento dell'ohmetro}
+
+Per la calibrazione del generatore di corrente, abbiamo deciso di cambiare il resistore $R_3$ con uno da $100k\ohm $ e in serie abbiamo messo un potenziometro R4 da $100k\ohm$. Lo scopo di questa configurazione era quello di garantire che la corrente $I_S$ rimanesse costante a $100uA$,indipendentemente dal valore della resistenza $R_X$
+
+\vspace{5pt}
+\noindent La procedura di calibrazione è stata eseguita nel modo seguente e viene ripetuta prima di ogni misurazione:
+
+\begin{itemize}
+    \item Abbiamo inserito il multimetro, configurato come milliamperometro, in serie a $R_X$;
+    
+    \item Abbiamo sostituito $R_X$ con un cortocircuito per simulare una resistenza nulla;
+    \item Abbiamo verificato che il milliamperometro fornisse una corrente di $100uA$;
+    \item Successivamente, abbiamo sostituito $R_X$ con un potenziometro da $10k\ohm$ portato a fine corsa;
+    \item Abbiamo verificato che il milliamperometro fornisse una corrente di $100uA \pm u(I_S)$
+    \item Infine, abbiamo regolato i potenziometri inseriti al posto di $R_3$ in modo da ottenere una corrente di $100uA$;
+\end{itemize}
+
+\noindent in Figura \ref{fig: gen_dim} presentiamo lo schema del circuito opportunamente dimensionato
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{gen_dim.png}
+    \caption{Generatore di corrente dimensionato}
+    \label{fig: gen_dim}
+\end{figure}
+
+
+\section{Progettare l'amplificatore di strumentazione e dimensionare i componenti per garantire le specifiche definite al punto 3}
+
+Le considerazioni sui resistori e le tensioni discusse qui di seguito sono relative al circuito illustrato nella Figura \ref{fig:strum} .
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{strumentazione.png}
+    \caption{Amplificatore da strumentazione}
+    \label{fig:strum}
+\end{figure}
+
+
+
+La tensione di uscita in un amplificatore da strumentazione è descritta come il prodotto del guadagno dell'amplificatore per la differenza di potenziale tra i suoi ingressi: 
+
+\begin{equation}
+    V_O = \frac{R_{13}}{R_9} (1+ \frac{2R_7}{R_G}) (V_2 - V_1) 
+\end{equation}
+
+\noindent Il guadagno dell'amplificatore lo facciamo coincidere con quello calcolato nel punto 2
+
+\begin{equation}
+     G = \frac{R_{13}}{R_9} (1+ \frac{2R_7}{R_G}) = 10
+     \label{eq:11}
+\end{equation}
+
+\noindent Per semplicità dei calcoli poniamo
+
+$R_7 = R_8 = 20k\ohm$
+
+$R_9 = R_{10} = 10k\ohm$
+
+\noindent Per la selezione delle resistenze $R_G$ e $R_{11}$, ci basiamo sui valori disponibili delle resistenze commerciali, considerando le tolleranze per ottenere i valori massimi e minimi. È inoltre essenziale che una parte di queste resistenze sia implementata attraverso un potenziometro per compensare le variazioni.
+
+In questo processo, dimensioniamo $R_G$ per ottenere un guadagno G=10, mentre $R_{11}$ è dimensionato per massimizzare la reiezione di modo comune (CMRR).
+
+\vspace{10pt}
+\noindent Iniziamo il processo di determinazione di $R_G$ attraverso l'inversione della formula \ref{eq:11}, ottenendo
+
+\begin{equation}
+    R_G = \frac{2R_7}{\frac{R_9 G}{R_{13}} - 1}
+\end{equation}
+
+\noindent Considerando che i resistori commerciali tipicamente presentano una tolleranza dell'1\%, possiamo scrivere
+
+\begin{equation}
+    R_{G_{min}} = \frac{2R_{7_{min}}}{\frac{R_{9_{max}} G}{R_{13_{min}}} - 1} = \frac{2 * 0,99 * 20k\ohm}{10 * \frac{1,01 * 10k\ohm}{0,99 * 20k\ohm} - 1} = 9656,15 \ohm
+\end{equation}
+    
+\begin{equation}
+     R_{G_{max}} = \frac{2R_{7_{max}}}{\frac{R_{9_{min}} G}{R_{13_{max}}} - 1} = \frac{2 * 1,01 * 20k\ohm}{10 * \frac{0,99 * 10k\ohm}{1,01 * 20k\ohm} - 1} = 10356,34 \ohm
+\end{equation}
+
+\noindent Di conseguenza, la resistenza $R_G$ subirà una variazione
+\begin{equation}
+    \Delta R_G =  R_{G_{max}} - R_{G_{min}} = 700, 19 \ohm
+\end{equation}
+
+\noindent Per compensare questa variazione, è sufficiente inserire in serire a $R_G$ un potenziometro da $1k\ohm$. Per disponibilità di componenti abbiamo scelto un potenziometro da 10k$\ohm$ e un resistore da 10k$\ohm$
+
+\vspace{20pt}
+\noindent Il CMRR, acronimo di "Common Mode Rejection Ratio" (Rapporto di Reiezione in Modalità Comune), è una misura della capacità di un amplificatore differenziale di sopprimere segnali che appaiono allo stesso modo su entrambi gli ingressi. In altre parole, rappresenta la capacità di un amplificatore di ignorare i segnali che si presentano simultaneamente su entrambi gli ingressi e amplificare solo la differenza tra i segnali sui due ingressi. Il CMRR viene generalmente espresso in decibel (dB) e indica il rapporto tra l'amplificazione del segnale differenziale e l'amplificazione del segnale in modalità comune. Un CMRR più alto indica una maggiore capacità dell'amplificatore di eliminare i segnali indesiderati che si presentano su entrambi gli ingressi.
+
+il CMRR è massimo quando
+
+\begin{equation}
+    \frac{R_9}{R_{10}} = \frac{R_{13}}{R_{11}}
+\end{equation}
+
+
+\noindent Per determinare il valore della resistenza  $R_{11}$. Per calcolare la sua variazione è necessario considerare le tolleranze dei componenti da cui dipende
+
+\begin{equation}
+    R_{11} = \frac{R_{13} * R_{10}}{R_9} 
+\end{equation}
+
+\noindent Si ricava
+
+\begin{equation}
+    R_{11_{min}} = \frac{R_{13_{min}} * R_{10_{min}}}{R_{9_{max}}} = \frac{0,99 * R_{13} * 0,99 * R_{10}}{1,01 * R_9} = 19,41k\ohm
+\end{equation}
+
+\begin{equation}
+    R_{11_{max}} = \frac{R_{13_{max}} * R_{10_{max}}}{R_{9_{min}}} = \frac{1,01 * R_{13} * 1,01 * R_{10}}{0,99 * R_9} = 20,61k\ohm
+\end{equation}
+
+Quindi, la variazione vale
+\begin{equation}
+    \Delta R_{11} = R_{11_{max}} - R_{11_{min}} = 1,2k\ohm
+\end{equation}
+
+\noindent La composizione del ramo di $R_{11}$ avviene mettendo in serie un potenziometro $R_{12}$ da $10k\ohm$ e un resistore $R_{11}$ da $12k\ohm$
+
+Sapendo che il CMRR è uguale al rapporto tra il guadagno di modo differenziale $A_D$ e il guadagno di modo comune $A_C$, dove nel nostro caso $A_D = 10$
+
+\begin{equation}
+    CMRR = \frac{A_D}{A_C}
+\end{equation}
+
+\noindent il guadagno di modo comune vale
+\begin{equation}
+    A_C = A_+ - A_-
+\end{equation}
+
+\noindent Nel caso ideale si ha $A_+ = A_-$ e quindi CMRR =$ \infty$. Nel caso reale è difficle ottenere la condizione $A_+ = A_-$, quindi avremo un
+$CMRR_{min}$. Questo rappresenta il livello minimo di attenuazione a partire dal quale la componente comune della tensione di modo comune diventa trascurabile in uscita.
+
+Considerando invece il caso peggiore, il valore di $CMRR_W$ sarà determinato dallo scostamento massimo $AC_{max}$ tra A+ e A- causato dalle tolleranze dei resistori.
+
+\noindent Non effettuando la regolazione di R12, la componente del modo comune subirebbe una riduzione minima, risultando significativamente presente all'uscita.
+
+\begin{equation}
+ A^+_{\text{max}} = \frac{R_{13}}{R_{9}} \left(1 + \frac{2 R_{7}}{R_{G_{\text{min}}}}\right) \\
+= \frac{20 \, \text{k}\Omega}{10 \, \text{k}\Omega} \left(1 + \frac{2 \cdot 20 \, \text{k}\Omega}{9656.15 \, \Omega}\right) \\
+= 10.285   
+\end{equation}
+
+
+
+\begin{equation}
+   A^-_{\text{min}} = \frac{R_{13}}{R_{9}} \left(1 + \frac{2 R_{7}}{R_{G_{\text{max}}}}\right) \\
+= \frac{20 \, \text{k}\Omega}{10 \, \text{k}\Omega} \left(1 + \frac{2 \cdot 20 \, \text{k}\Omega}{10356.34 \, \Omega}\right) \\
+= 9.725 
+\end{equation}
+
+
+
+\begin{equation}
+  A_{C_{\text{max}}} = A^+_{\text{max}} - A^-_{\text{min}} \\
+= 0.56  
+\end{equation}
+
+
+
+\begin{equation}
+    \text{CMRR}_w = \frac{A_D}{A_{ C_{\text{max}}}} \\
+= \frac{10}{0.56} \\
+= 17.857
+\end{equation}
+
+
+
+\begin{equation}
+    \text{CMRR}_w [\text{dB}] = 20 \cdot \log_{10}(\text{CMRR}) \\
+= 25.03 \, \text{dB}
+\end{equation}
+
+
+Modificando opportunamente il valore di R12, è possibile attenuare significativamente il guadagno in modo comune, facendo sì che A+ sia uguale a A-. In questo modo, si ottengono valori di CMRR superiori rispetto a quelli di $CMRR_w$.
+
+\vspace{5pt}
+\noindent Considerando le tensioni applicate all'ingresso dell'amplificatore: $V_{max} = 1V$ e $V_{min} = 0V$, possiamo determinare che la massima tensione di modo comune Vc in ingresso è:
+
+\begin{equation}
+    V_{c_{max}} = \frac{V_{max} + V_{min}}{2} = 0,5V
+\end{equation}
+
+\noindent 
+Per minimizzare l'influenza dell'amplificazione della tensione di modo comune sulla misura della tensione di uscita dell'amplificatore, è fondamentale che il prodotto tra la tensione massima di modo comune e il guadagno di modo comune risulti trascurabile rispetto all'incertezza associata a Vo.
+
+Dall' equazione \ref{eq:9} sappiamo che u(Vo) = 0,05V
+
+\noindent Quindi
+
+\begin{equation}
+    V_{c_{max}} * A_c << u(V_o)
+\end{equation}
+
+Calcoliamo dunque la massima amplificazione $A_{c_{max}}$ tale da rendere trascurabile Vc rispetto a Vo, ossia dividiamo per un fattore 100.
+
+\begin{equation}
+    A_{c_{max}} = \frac{0,05}{100 * 0,5} = 0,001
+\end{equation}
+
+Considerando il guadagno differenziale $A_D$ = 10
+\begin{equation}
+    CMRR_{min} = \frac{A_D}{A_{c_{max}}} = 10000
+    \label{eq:cmrr_min}
+\end{equation}
+
+\begin{equation}
+    CMRR_{min,dB} = 20 log (CMRR_{min}) = 80dB
+    \label{eq:cmrr_min_Db}
+\end{equation}
+
+\noindent Questo significa che per misurare la tensione Vo in assenza della componente di
+modo comune dobbiamo verificare che il valore del CMRR trovato superi 80 dB.
+
+\vspace{6pt}
+In Figura \ref{fig:strum_Dim} lo schema del amplificatore di strumentazione opportunamente dimensionato
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{strum_dim.png}
+    \caption{Amplificatore da strumentazione dimensionato}
+    \label{fig:strum_Dim}
+\end{figure}
+
+\section{Definire la procedura di calibrazione dell'amplificatore da strumentazione da mettere in atto per ottimizzare il funzionamento e garantirne le specifiche sull'intero campo di lavoro dell'ohmmetro}
+
+Utilizzando il generatore di segnali, introduciamo un segnale di ampiezza sufficientemente elevata all'ingresso dell'amplificatore, al fine di ottenere un'uscita amplificata con tensione di modo comune (Voc). Riducendo al minimo tale tensione, possiamo considerarla trascurabile anche per tensioni di uscita più basse.
+
+Per ottenere questo risultato, cortocircuitiamo gli ingressi dell'amplificatore da strumentazione per ottenere la medesima tensione su entrambi gli ingressi. Successivamente, impostiamo una tensione in ingresso di 12 Vpp. La frequenza del segnale è fissata a 78 Hz, scelta per simulare la bassa frequenza di funzionamento del circuito.
+
+Il valore minimo della tensione di modo comune (Voc) è determinato dal $CMRR_{min}$, come definito nelle formule \ref{eq:cmrr_min} e \ref{eq:cmrr_min_Db}. Affinché l'attenuazione sia di 80 dB, la tensione di modo comune deve essere ridotta di un fattore ${Ac_{max}} = 0,001$ rispetto all'ingresso.
+
+\vspace{5pt}
+\noindent In queste condizioni il valore massimo della tensione di uscita di modo comune sarà
+
+\begin{equation}
+    V_{oc_{max}} = Ac_{max} * V_i = 0,01 Vpp
+\end{equation}
+
+%\noindent Modificando il valore della resistenza del potenziometro R12 a $10 k\ohm$, si ottiene una tensione $V_{oc} = $, come illustrato nella Figura \ref{}. Questa configurazione conduce a una notevole diminuzione dell'amplificazione di modalità comune.%
+
+\noindent Sapendo che il CMRR misurato è pari a 
+\begin{equation}
+    CMRR = \frac{A_D}{Ac_{min}}
+\end{equation}
+
+\noindent andiamo a regolare R12 otteniamo una $V_{oc}$ tale per cui l'amplificazione di modo comune è ridotta al minimo
+
+\begin{equation}
+    Ac_{min} = \frac{V_{oc}}{V_i} 
+\end{equation}
+
+\noindent Andando a calcolare il CMRR ci deve risultare
+
+\begin{equation}
+    CMRR = \frac{A_D}{Ac_{min}} > CMRR_{min} = 10000
+\end{equation}
+
+\section{Montare i due prototipi e verificarne il corretto funzionamento}
+Il prototipo mostrato in figura \ref{fig:test1} è di Milosevic, mentre in figura \ref{fig:test2} è di Zani
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\textwidth]{mio_circ.jpg}
+  \captionof{figure}{Prototipo di Milosevic}
+  \label{fig:test1}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\textwidth]{zani circuito.jpg}
+  \captionof{figure}{Prototipo di Zani}
+  \label{fig:test2}
+\end{minipage}
+\end{figure}
+
+
+
+\uline{Test}
+
+\noindent Eseguiamo dei test per verificare il corretto funzionamento dei due prototipi. Di seguito rappresentiamo alcune misure effettuate.
+
+\noindent Nella Figura \ref{fig:a}, Figura \ref{fig:d}, Figura \ref{fig:g} rappresentiamo il valore delle resistenze misurato con il multimetro. 
+
+\noindent Nella Figura \ref{fig:b}, Figura \ref{fig:e}, Figura \ref{fig:h} rappresentiamo il valore della tensione ai capi di Rx.
+
+\noindent Nella Figura \ref{fig:c}, Figura \ref{fig:f}, Figura \ref{fig:i} rappresentiamo la tensione in uscita dal amplificatore da strumentazione.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{.3\textwidth}
+  \centering
+  \includegraphics[width=.8\textwidth]{1k.jpg}
+  \captionof{figure}{Rx}
+  \label{fig:a}
+\end{minipage}%
+\begin{minipage}{.3\textwidth}
+  \centering
+  \includegraphics[width=.8\textwidth]{100.jpg}
+  \captionof{figure}{VRx}
+  \label{fig:b}
+\end{minipage}
+\begin{minipage}{.3\textwidth}
+  \centering
+  \includegraphics[width=.8\textwidth]{1v.jpg}
+  \captionof{figure}{Vo}
+  \label{fig:c}
+\end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{.3\textwidth}
+  \centering
+  \includegraphics[width=.8\textwidth]{3.jpg}
+  \captionof{figure}{Rx}
+  \label{fig:d}
+\end{minipage}%
+\begin{minipage}{.3\textwidth}
+  \centering
+  \includegraphics[width=.8\textwidth]{33.jpg}
+  \captionof{figure}{VRx}
+  \label{fig:e}
+\end{minipage}
+\begin{minipage}{.3\textwidth}
+  \centering
+  \includegraphics[width=.8\textwidth]{333.jpg}
+  \captionof{figure}{Vo}
+  \label{fig:f}
+\end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{.3\textwidth}
+  \centering
+  \includegraphics[width=.8\textwidth]{10k.jpg}
+  \captionof{figure}{Rx}
+  \label{fig:g}
+\end{minipage}%
+\begin{minipage}{.3\textwidth}
+  \centering
+  \includegraphics[width=.8\textwidth]{10KK.jpg}
+  \captionof{figure}{VRx}
+  \label{fig:h}
+\end{minipage}
+\begin{minipage}{.3\textwidth}
+  \centering
+  \includegraphics[width=.8\textwidth]{10v.jpg}
+  \captionof{figure}{Vo}
+  \label{fig:i}
+\end{minipage}
+\end{figure}
+
+\section{Determinare la curva di taratura di ciascun prototipo facendo uso di un solo
+multimetro scelto fra quelli in dotazione del laboratorio come ohmmetro di
+riferimento.}
+
+La procedura che segue viene applicata a entrambi i prototipi:
+\begin{itemize}
+    \item Calibrare i circuiti come spiegato nei punti 5 e 7.
+    \item Utilizzando un multimetro in modalità ohmetro, misurare la resistenza di un resistore Rx che nelle Tabelle \ref{tab:dati milo} e \ref{tab:dati} chiameremo "Rx multimetro".
+    \item Inserire il resistore Rx nell'ohmetro
+
+    \item Misurare la tensione Vo con il multimetro
+    \item Avendo Vo calcolare il valore di Rx come: $Rx = \frac{V_o}{I_S \cdot G}$. Nelle Tabelle \ref{tab:dati milo} e \ref{tab:dati} è chiamata "Rx misurata"
+    
+\end{itemize}
+
+\begin{table}[h!]
+\centering
+\caption{Dati taratura Milosevic}
+\begin{tabular}{|S[table-format=4.1]|S[table-format=1.3]|S[table-format=4.0]|}
+\hline
+\textbf{Rx multimetro[$\ohm$]} & \textbf{Vo[V]} & \textbf{Rx misurata[$\ohm$]} \\
+\hline
+0,0 & 0,009 & 9 \\
+\hline
+217,7 & 0,226 & 226\\
+\hline
+556,5 & 0,563 & 563\\
+\hline
+824,0 & 0,831 & 831 \\
+\hline
+996,0 & 1,002 & 1002 \\
+\hline
+1803,0 & 1,807 & 1807 \\
+\hline
+2192,0 & 2,199 & 2199 \\
+\hline
+3925,0 & 3,930 & 3930 \\
+\hline
+4700,0 & 4,704 & 4704 \\
+\hline
+6770,0 & 6,780 & 6780 \\
+\hline
+8150,0 & 8,160 & 8160 \\
+\hline
+9950,0 & 9,930 & 9930 \\
+\hline
+\end{tabular}
+
+\label{tab:dati milo}
+\end{table}
+
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel={Vo [V]},
+    ylabel={Rx [$\ohm$]},
+    legend pos=north west,
+    grid=both,
+    grid style={line width=.1pt, draw=gray!10},
+    width=12cm,
+    height=8cm,
+    xticklabel style={/pgf/number format/.cd,fixed,precision=3},
+    yticklabel style={/pgf/number format/.cd,fixed,precision=0,1000 sep={}},
+    axis lines=left
+]
+
+\addplot[
+only marks,
+    color=blue,
+    mark=*,
+    ]
+    coordinates {
+    (0.009,9)
+    (0.226,226)
+    (0.563,563)
+    (0.831,831)
+    (1.002,1002)
+    (1.807,1807)
+    (2.199,2199)
+    (3.930,3930)
+    (4.704,4704)
+    (6.780,6780)
+    (8.160,8160)
+    (9.930,9930)
+    };
+    
+
+\end{axis}
+\end{tikzpicture}
+\caption{Punti sperimentali Milosevic}
+\label{fig:grafico}
+\end{figure}
+
+
+La retta linearizzata ai minimi quadrati ha equazione:
+
+\begin{equation}
+    R_x = 1001,28 [\frac{\ohm}{V}] \cdot V_o[V] -9,05[\ohm]
+\end{equation}
+
+La stima dell’incertezza tipo introdotta dalla linearizzazione:
+\begin{equation}
+    u_{lin}(R_x)_{Milosevic} = \sqrt{\frac{\sum_{i=1}^N [y_i - (ax_i + b)^2]}{N-2}} = 6,5 \ohm
+\end{equation}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\begin{table}[h!]
+\centering
+\caption{Dati taratura Zani}
+\begin{tabular}{|S[table-format=4.1]|S[table-format=1.3]|S[table-format=4.0]|}
+\hline
+\textbf{Rx multimetro[$\ohm$]} & \textbf{Vo[V]} & \textbf{Rx misurata[$\ohm$]} \\
+\hline
+0,0 & 0,010 & 10 \\
+\hline
+217,7 & 0,226 & 226\\
+\hline
+556,5 & 0,562 & 562\\
+\hline
+824,0 & 0,827 & 827 \\
+\hline
+996,0 & 0,999 & 999 \\
+\hline
+1803,0 & 1,801 & 1801 \\
+\hline
+2192,0 & 2,188 & 2188 \\
+\hline
+3925,0 & 3,910 & 3910 \\
+\hline
+4700,0 & 4,680 & 4680 \\
+\hline
+6770,0 & 6,750 & 6750 \\
+\hline
+8150,0 & 8,120 & 8120 \\
+\hline
+9950,0 & 9,890 & 9890 \\
+\hline
+\end{tabular}
+
+\label{tab:dati}
+\end{table}
+
+
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel={Vo [V]},
+    ylabel={Rx [$\ohm$]},
+    legend pos=north west,
+    grid=both,
+    grid style={line width=.1pt, draw=gray!10},
+    width=12cm,
+    height=8cm,
+    xticklabel style={/pgf/number format/.cd,fixed,precision=3},
+    yticklabel style={/pgf/number format/.cd,fixed,precision=0,1000 sep={}},
+    axis lines=left
+]
+
+\addplot[
+    only marks,
+    color=red,
+    mark=*,
+    ]
+    coordinates {
+    (0.010,10)
+    (0.226,226)
+    (0.562,562)
+    (0.827,827)
+    (0.999,999)
+    (1.801,1801)
+    (2.188,2188)
+    (3.910,3910)
+    (4.680,4680)
+    (6.750,6750)
+    (8.120,8120)
+    (9.890,9890)
+    };
+
+\end{axis}
+\end{tikzpicture}
+\caption{Punti sperimentali Zani}
+\label{fig:grafico_dati_zani}
+\end{figure}
+
+La retta linearizzata ai minimi quadrati ha equazione:
+
+\begin{equation}
+    R_x = 1005,85 [\frac{\ohm}{V}] \cdot V_o[V] -9,38[\ohm]
+\end{equation}
+
+La stima dell’incertezza tipo introdotta dalla linearizzazione:
+\begin{equation}
+    u_{lin}(R_x)_{Zani} = \sqrt{\frac{\sum_{i=1}^N [y_i - (ax_i + b)^2]}{N-2}} = 5,097 \ohm
+\end{equation}
+
+
+
+\section{Verificare la compatibilità delle misure fornite dai due prototipi per almeno dieci
+valori di resistenza distribuiti nel campo di misura.}
+
+Calcoliamo l'incertezza dell'ohmetro:
+
+\noindent Dalla equazione \ref{eq:9} sappiamo che u(Vo) = 0,05V
+
+\vspace{5pt}
+Quindi:
+\begin{equation}
+    u(R_x)_{Milosevic} = \sqrt{u^2_{lin}(R_x)_{Milosevic} + (\frac{\partial R_x}{\partial V_o})^2 \cdot u^2(V_o)} = 50,48\ohm
+\end{equation}
+
+\begin{equation}
+    u(R_x)_{Zani} = \sqrt{u^2_{lin}(R_x)_{Zani} + (\frac{\partial R_x}{\partial V_o})^2 \cdot u^2(V_o)} = 50,55\ohm
+\end{equation}
+
+\noindent Considerando k=1 si ha
+
+\begin{equation}
+    U(R_x)_{Milosevic} = 50,48\ohm
+    \end{equation}
+  \begin{equation}  
+    U(R_x)_{Zani} = 50,55\ohm
+\end{equation}
+
+\vspace{10pt}
+\uline{Compatibilità}
+
+\noindent Verifichiamo le compatibilità considerando le accuratezze precedentemente calcolate
+
+\begin{figure}[!htb]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={}, % Rimozione dell'etichetta dell'asse x
+            ylabel={$R_x \pm U(R_X)$}, % Rimozione dell'etichetta dell'asse y
+            xmin=0, xmax=2.2,
+            ymin=-100, ymax=100,
+            grid=both,
+            legend pos=north west,
+            xtick=\empty, % Rimozione dei tick sull'asse x
+        ]
+        
+        % Dati misura 1
+        \addplot[
+            only marks,
+            color=red,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (1, 0) +- (0, 50.48)
+        };
+        \addlegendentry{Milosevic}
+        
+        % Dati misura 2
+        \addplot[
+            only marks,
+            color=blue,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (2, 0) +- (0, 50.55)
+        };
+        \addlegendentry{Zani}
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Compatibilità Misura 1}
+    \label{fig:mis1}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={}, % Rimozione dell'etichetta dell'asse x
+            ylabel={$R_x \pm U(R_X)$}, % Rimozione dell'etichetta dell'asse y
+            xmin=0, xmax=2.2,
+            ymin=100, ymax=300,
+            grid=both,
+            legend pos=north west,
+            xtick=\empty, % Rimozione dei tick sull'asse x
+        ]
+        
+        % Dati misura 1
+        \addplot[
+            only marks,
+            color=red,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (1, 226) +- (0, 50.48)
+        };
+        \addlegendentry{Milosevic}
+        
+        % Dati misura 2
+        \addplot[
+            only marks,
+            color=blue,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (2, 226) +- (0, 50.55)
+        };
+        \addlegendentry{Zani}
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Compatibilità misura 2}
+    \label{fig:mis2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={}, % Rimozione dell'etichetta dell'asse x
+            ylabel={$R_x \pm U(R_X)$}, % Rimozione dell'etichetta dell'asse y
+            xmin=0, xmax=2.2,
+            ymin=500, ymax=630,
+            grid=both,
+            legend pos=north west,
+            xtick=\empty, % Rimozione dei tick sull'asse x
+        ]
+        
+        % Dati misura 1
+        \addplot[
+            only marks,
+            color=red,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (1, 563) +- (0, 50.48)
+        };
+        \addlegendentry{Milosevic}
+        
+        % Dati misura 2
+        \addplot[
+            only marks,
+            color=blue,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (2, 562) +- (0, 50.55)
+        };
+        \addlegendentry{Zani}
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Compatibilità misura 3}
+    \label{fig:mis2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={}, % Rimozione dell'etichetta dell'asse x
+            ylabel={$R_x \pm U(R_X)$}, % Rimozione dell'etichetta dell'asse y
+            xmin=0, xmax=2.2,
+            ymin=750, ymax=900,
+            grid=both,
+            legend pos=north west,
+            xtick=\empty, % Rimozione dei tick sull'asse x
+            yticklabel style={/pgf/number format/.cd,fixed,precision=0,1000 sep={}},
+        ]
+        
+        % Dati misura 1
+        \addplot[
+            only marks,
+            color=red,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (1, 831) +- (0, 50.48)
+        };
+        \addlegendentry{Milosevic}
+        
+        % Dati misura 2
+        \addplot[
+            only marks,
+            color=blue,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (2, 827) +- (0, 50.55)
+        };
+        \addlegendentry{Zani}
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Compatibilità misura 4}
+    \label{fig:mis4}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={}, % Rimozione dell'etichetta dell'asse x
+            ylabel={$R_x \pm U(R_X)$}, % Rimozione dell'etichetta dell'asse y
+            xmin=0, xmax=2.2,
+            ymin=940, ymax=1060,
+            grid=both,
+            legend pos=north west,
+            xtick=\empty, % Rimozione dei tick sull'asse x
+            yticklabel style={/pgf/number format/.cd,fixed,precision=0,1000 sep={}},
+        ]
+        
+        % Dati misura 1
+        \addplot[
+            only marks,
+            color=red,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (1, 1002) +- (0, 50.48)
+        };
+        \addlegendentry{Milosevic}
+        
+        % Dati misura 2
+        \addplot[
+            only marks,
+            color=blue,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (2, 999) +- (0, 50.55)
+        };
+        \addlegendentry{Zani}
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Compatibilità misura 5}
+    \label{fig:mis5}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={}, % Rimozione dell'etichetta dell'asse x
+            ylabel={$R_x \pm U(R_X)$}, % Rimozione dell'etichetta dell'asse y
+            xmin=0, xmax=2.2,
+            ymin=1740, ymax=1900,
+            grid=both,
+            legend pos=north west,
+            xtick=\empty, % Rimozione dei tick sull'asse x
+            yticklabel style={/pgf/number format/.cd,fixed,precision=0,1000 sep={}},
+        ]
+        
+        % Dati misura 1
+        \addplot[
+            only marks,
+            color=red,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (1, 1807) +- (0, 50.48)
+        };
+        \addlegendentry{Milosevic}
+        
+        % Dati misura 2
+        \addplot[
+            only marks,
+            color=blue,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (2, 1801) +- (0, 50.55)
+        };
+        \addlegendentry{Zani}
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Compatibilità misura 6}
+    \label{fig:mis6}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={}, % Rimozione dell'etichetta dell'asse x
+            ylabel={$R_x \pm U(R_X)$}, % Rimozione dell'etichetta dell'asse y
+            xmin=0, xmax=2.2,
+            ymin=2100, ymax=2280,
+            grid=both,
+            legend pos=north west,
+            xtick=\empty, % Rimozione dei tick sull'asse x
+            yticklabel style={/pgf/number format/.cd,fixed,precision=0,1000 sep={}},
+        ]
+        
+        % Dati misura 1
+        \addplot[
+            only marks,
+            color=red,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (1, 2199) +- (0, 50.48)
+        };
+        \addlegendentry{Milosevic}
+        
+        % Dati misura 2
+        \addplot[
+            only marks,
+            color=blue,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (2, 2188) +- (0, 50.55)
+        };
+        \addlegendentry{Zani}
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Compatibilità misura 7}
+    \label{fig:mis7}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={}, % Rimozione dell'etichetta dell'asse x
+            ylabel={$R_x \pm U(R_X)$}, % Rimozione dell'etichetta dell'asse y
+            xmin=0, xmax=2.2,
+            ymin=3800, ymax=4000,
+            grid=both,
+            legend pos=north west,
+            xtick=\empty, % Rimozione dei tick sull'asse x
+            yticklabel style={/pgf/number format/.cd,fixed,precision=0,1000 sep={}},
+        ]
+        
+        % Dati misura 1
+        \addplot[
+            only marks,
+            color=red,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (1, 3930) +- (0, 50.48)
+        };
+        \addlegendentry{Milosevic}
+        
+        % Dati misura 2
+        \addplot[
+            only marks,
+            color=blue,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (2, 3910) +- (0, 50.55)
+        };
+        \addlegendentry{Zani}
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Compatibilità misura 8}
+    \label{fig:mis8}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={}, % Rimozione dell'etichetta dell'asse x
+            ylabel={$R_x \pm U(R_X)$}, % Rimozione dell'etichetta dell'asse y
+            xmin=0, xmax=2.2,
+            ymin=4600, ymax=4800,
+            grid=both,
+            legend pos=north west,
+            xtick=\empty, % Rimozione dei tick sull'asse x
+            yticklabel style={/pgf/number format/.cd,fixed,precision=0,1000 sep={}},
+        ]
+        
+        % Dati misura 1
+        \addplot[
+            only marks,
+            color=red,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (1, 4704) +- (0, 50.48)
+        };
+        \addlegendentry{Milosevic}
+        
+        % Dati misura 2
+        \addplot[
+            only marks,
+            color=blue,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (2, 4680) +- (0, 50.55)
+        };
+        \addlegendentry{Zani}
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Compatibilità misura 9}
+    \label{fig:mis9}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={}, % Rimozione dell'etichetta dell'asse x
+            ylabel={$R_x \pm U(R_X)$}, % Rimozione dell'etichetta dell'asse y
+            xmin=0, xmax=2.2,
+            ymin=6650, ymax=6900,
+            grid=both,
+            legend pos=north west,
+            xtick=\empty, % Rimozione dei tick sull'asse x
+            yticklabel style={/pgf/number format/.cd,fixed,precision=0,1000 sep={}},
+        ]
+        
+        % Dati misura 1
+        \addplot[
+            only marks,
+            color=red,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (1, 6780) +- (0, 50.48)
+        };
+        \addlegendentry{Milosevic}
+        
+        % Dati misura 2
+        \addplot[
+            only marks,
+            color=blue,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (2, 6750) +- (0, 50.55)
+        };
+        \addlegendentry{Zani}
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Compatibilità misura 10}
+    \label{fig:mis10}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={}, % Rimozione dell'etichetta dell'asse x
+            ylabel={$R_x \pm U(R_X)$}, % Rimozione dell'etichetta dell'asse y
+            xmin=0, xmax=2.2,
+            ymin=8000, ymax=8250,
+            grid=both,
+            legend pos=north west,
+            xtick=\empty, % Rimozione dei tick sull'asse x
+            yticklabel style={/pgf/number format/.cd,fixed,precision=0,1000 sep={}},
+        ]
+        
+        % Dati misura 1
+        \addplot[
+            only marks,
+            color=red,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (1, 8160) +- (0, 50.48)
+        };
+        \addlegendentry{Milosevic}
+        
+        % Dati misura 2
+        \addplot[
+            only marks,
+            color=blue,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (2, 8120) +- (0, 50.55)
+        };
+        \addlegendentry{Zani}
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Compatibilità misura 11}
+    \label{fig:mis11}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={}, % Rimozione dell'etichetta dell'asse x
+            ylabel={$R_x \pm U(R_X)$}, % Rimozione dell'etichetta dell'asse y
+            xmin=0, xmax=2.2,
+            ymin=9800, ymax=9999,
+            grid=both,
+            legend pos=north west,
+            xtick=\empty, % Rimozione dei tick sull'asse x
+            yticklabel style={/pgf/number format/.cd,fixed,precision=0,1000 sep={}},
+        ]
+        
+        % Dati misura 1
+        \addplot[
+            only marks,
+            color=red,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (1, 9930) +- (0, 50.48)
+        };
+        \addlegendentry{Milosevic}
+        
+        % Dati misura 2
+        \addplot[
+            only marks,
+            color=blue,
+            error bars/.cd,
+            y dir=both,
+            y explicit,
+            x dir=none
+        ]
+        coordinates {
+            (2, 9890) +- (0, 50.55)
+        };
+        \addlegendentry{Zani}
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Compatibilità misura 12}
+    \label{fig:mis12}
+\end{figure}
+
+\newpage
+\section{Conclusione}
+
+I due prototipi, sviluppati e realizzati per misurare il valore di una resistenza incognita Rx tramite la lettura della tensione ai suoi capi, sono stati testati per verificare la conformità alle specifiche del progetto. Ecco i risultati:
+
+\begin{itemize}
+    \item \textbf{Campo di misura 0-10 $k\ohm$: Conforme}
+    
+Il campo di misura specificato è rispettato. I test sperimentali hanno confermato che gli ohmetri funzionano correttamente anche ai limiti del campo di misura, fornendo letture accurate sia intorno a 0 $\ohm$ sia intorno a 10 $k\ohm$.
+
+    \item \textbf{Accuratezza di misura 1\% F.S. (100 $\ohm$): Conforme}
+    
+Il prototipo con la maggiore incertezza di misura, progettato da Zani, ha mostrato un'incertezza di 50,55 $\ohm$, che rientra nei limiti massimi richiesti. Questo valore è quindi considerato accettabile.
+
+\item \textbf{Lettura di tensione 0-10 V: Conforme}
+
+Entrambi i prototipi sono stati progettati per garantire una lettura di tensione massima 
+Vo=10V, rispettando così le specifiche progettuali.
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+\end{document}
